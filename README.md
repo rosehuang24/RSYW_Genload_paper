@@ -64,4 +64,12 @@ parallel --colsep '\t' \
 cat snpeff_anno/*MODIFIER.NH.pos.bed | sort -k 1,1n -k 2,2n > 116.neutral.pos.bed
 ```
 
+### Deposition of coordinates of the three variant impact classes:
+
+```
+/storage/zhenyingLab/huangruoshi/genload/116.neutral.pos.bed
+/storage/zhenyingLab/huangruoshi/genload/116.synonymous.pos.bed
+/storage/zhenyingLab/huangruoshi/genload/116.deleterious.pos.bed
+```
+
 
