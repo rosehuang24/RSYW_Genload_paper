@@ -111,7 +111,7 @@ cd RSYW_ROH/all.ROHs/
 paste ../../RSYW.breed.indv.totalROHlength deleterious.het.count deleterious.non-roh.homALT.count deleterious.roh.homALT.count neutral.het.count neutral.non-roh.homALT.count neutral.roh.homALT.count synonymous.het.count synonymous.non-roh.homALT.count synonymous.roh.homALT.count \
        | cut -f 1-3,5,7,9,11,13,15,17,19,21 > all.ROH.cat
 
-sed -i '1i\breed\tindv\tROHlength\tdel_het\tdel_nonROH_hom\tdel_ROHhom\tneu_het\tneu_nonROH_hom\tneu_ROHhom\tsyn_het\tsyn_nonROH_hom\tsyn_ROHhom' all.ROH.cat
+sed -i '1i\breed\tindv\tROHlength\tdel_het\tdel_nonROH_hom\tdel_ROH_hom\tneu_het\tneu_nonROH_hom\tneu_ROH_hom\tsyn_het\tsyn_nonROH_hom\tsyn_ROH_hom' all.ROH.cat
 
 ```
 
