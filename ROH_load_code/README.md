@@ -128,6 +128,8 @@ sed -i '1i\indv\tdel_Mrhom\tsyn_Mrhom\tneu_Mrhom' mega_homalt.indv.del.syn.neu
 ### put those two dataframes together
 
 ```
-paste all.ROHs/all.ROH.cat long_homalt.indv.del.syn.neu  mega_homalt.indv.del.syn.neu  short_homalt.indv.del.syn.neu long.indv.length  mega.indv.length  short.indv.length | cut -f -12,14-16,18-20,22-24,26,28,30 > RSYW.breed.indv.ROH.all.and.3classes
+paste all.ROHs/all.ROH.cat long_homalt.indv.del.syn.neu  mega_homalt.indv.del.syn.neu  short_homalt.indv.del.syn.neu long.indv.length  mega.indv.length  short.indv.length \
+       | cut -f -12,14-16,18-20,22-24,26,28,30 \
+       > RSYW.breed.indv.ROH.all.and.3classes
 
 ```
