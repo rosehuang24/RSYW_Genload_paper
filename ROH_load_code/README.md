@@ -2,7 +2,7 @@
 
 ## 1. Extract hom/het variants or different regions
 
-### ROH as in general
+### Extracting ROH as in general
 
 20230825 thoughts:
 
@@ -14,6 +14,7 @@ Now the work is to use the ROH called from original ROH (XX.ROHs) and then extra
 ```
 #paths:
 CRNTDIR=/storage/zhenyingLab/huangruoshi/genload
+TXTDIR=/storage/zhenyingLab/huangruoshi/txt_might_be_useful
 rohfile=$CRNTDIR/ROH_sheets/$indv.ROHs
 
 vcftools --gzvcf $indvvcf --bed $rohfile \
@@ -38,7 +39,7 @@ example rohfile: ```$CRNTDIR/ROH_sheets/mega.ROH_sheets/SK03.mega.ROHs```
 
 example output: ```$CRNTDIR/RSYW_ROH/mega.ROHs/SK03_mega.ROH_homalt.bed```
 
-#### Extracting ROHs categories
+#### Extracting coordinates of different ROH classes
 ```
 parallel --colsep '\t' awk \'\(\$2==\"{2}\"\) \&\& \(\$5\-\$4\<300001\) {print\$3\"\\t\"\$4\"\\t\"\$5}\' $CRNTDIR/ROH_sheets/short.ROH_sheets/input.4.107.ROHs \> $CRNTDIR/ROH_sheets/short.ROH_sheets/{2}.short.ROHs :::: $TXTDIR/107.breed_indv_depth.DL.txt
 
@@ -46,6 +47,7 @@ parallel --colsep '\t' awk \'\(\$2==\"{2}\"\) \&\& \(\$5\-\$4\>300000\) \&\& \(\
 
 parallel --colsep '\t' awk \'\(\$2==\"{2}\"\) \&\& \(\$5\-\$4\>1000000\) {print\$3\"\\t\"\$4\"\\t\"\$5}\' $CRNTDIR/ROH_sheets/mega.ROH_sheets/input.4.107.ROHs \> $CRNTDIR/ROH_sheets/mega.ROH_sheets/{2}.mega.ROHs :::: $TXTDIR/107.breed_indv_depth.DL.txt
 ```
+
 #### Get lengths of different ROH classes
 
 ```
@@ -55,7 +57,8 @@ parallel mv RSYW_ROH/{}.1 RSYW_ROH/{}.indv.length ::: short long mega
 parallel sed -i \'1i\\indv\\t{}_length\' RSYW_ROH/{}.indv.length ::: short long mega
 ```
 
-#### Extracting coordinates for variants
+#### Extracting variants positions in different ROH classes
+
 ```
 parallel bedtools intersect \
         -a vcfs/{1}.roh.homALT.recode.vcf \
@@ -87,24 +90,44 @@ parallel bedtools intersect \
       \> RSYW_ROH/{2}.ROHs/{1}_{2}.ROH_homalt.{3} \
       :::: $TXTDIR/RSYW.popline.txt ::: short long mega ::: deleterious synonymous neutral
 
-parallel --dryrun wc -l RSYW_ROH/{1}.ROHs/*{2} \| grep -v total \| sed \'s/ROHs\\//\\t/g\;s/_{1}/\\t/g\' \| awk \'{print\$3\"\\t\"\$1}\' \> RSYW_ROH/{1}.ROHs/{2}.{1}ROH_homalt.cat ::: short long mega ::: deleterious synonymous neutral
+parallel wc -l RSYW_ROH/{1}.ROHs/*{2} \| grep -v total \| sed \'s/ROHs\\//\\t/g\;s/_{1}/\\t/g\' \| awk \'{print\$3\"\\t\"\$1}\' \> RSYW_ROH/{1}.ROHs/{2}.{1}ROH_homalt.cat ::: short long mega ::: deleterious synonymous neutral
 ```
 
 ## 3. Integrate the data
 
+### for ROH in general
+
+```
+#count the number
+parallel wc -l RSYW_ROH/all.ROHs/*{1}.{2}.bed \
+              \| grep -v total \
+              \| sed \'s/\\.{1}/\\t/g\' \
+              \| awk \'{print\$2\"\\t\"\$1}\' \
+              \| sort \> RSYW_ROH/all.ROHs/{1}.{2}.count \
+              ::: deleterious synonymous neutral ::: roh.homALT non-roh.homALT het
+#build the dataframe
+cd RSYW_ROH/all.ROHs/
+
+paste ../../RSYW.breed.indv.totalROHlength deleterious.het.count deleterious.non-roh.homALT.count deleterious.roh.homALT.count neutral.het.count neutral.non-roh.homALT.count neutral.roh.homALT.count synonymous.het.count synonymous.non-roh.homALT.count synonymous.roh.homALT.count \
+       | cut -f 1-3,5,7,9,11,13,15,17,19,21 > all.ROH.cat
+
+sed -i '1i\breed\tindv\tROHlength\tdel_het\tdel_nonROH_hom\tdel_ROHhom\tneu_het\tneu_nonROH_hom\tneu_ROHhom\tsyn_het\tsyn_nonROH_hom\tsyn_ROHhom' all.ROH.cat
+
+```
+
+### for different ROH classes
+
 ```
 parallel paste RSYW_ROH/{1}.ROHs/deleterious.{1}ROH_homalt.cat RSYW_ROH/{1}.ROHs/synonymous.{1}ROH_homalt.cat RSYW_ROH/{1}.ROHs/neutral.{1}ROH_homalt.cat \| cut -f 1,2,4,6 \> RSYW_ROH/{1}_homalt.indv.del.syn.neu ::: short long mega
 
-#parallel sed -i \'1i\\indv\\tdel_rhom\\tsyn_rhom\\tneu_rhom\' {1}_homalt.indv.del.syn.neu ::: short long mega
+#parallel sed -i \'1i\\indv\\tdel_rhom\\tsyn_rhom\\tneu_rhom\' {1}_homalt.indv.del.syn.neu ::: short long mega 
 sed -i '1i\indv\tdel_Srhom\tsyn_Srhom\tneu_Srhom' short_homalt.indv.del.syn.neu
 sed -i '1i\indv\tdel_Lrhom\tsyn_Lrhom\tneu_Lrhom' long_homalt.indv.del.syn.neu
 sed -i '1i\indv\tdel_Mrhom\tsyn_Mrhom\tneu_Mrhom' mega_homalt.indv.del.syn.neu
+```
+### put those two dataframes together
 
-paste RSYW.delrhom_delhet_delnrhom_neurhom_neuhet_neunrhom_synrhom_synhet_synnrhom.result short_homalt.indv.del.syn.neu long_homalt.indv.del.syn.neu mega_homalt.indv.del.syn.neu  | cut -f 1-12,14-16,18-20,22-24 > RSYW_everything_withlengthsHomCount
+```
+paste all.ROHs/all.ROH.cat long_homalt.indv.del.syn.neu  mega_homalt.indv.del.syn.neu  short_homalt.indv.del.syn.neu long.indv.length  mega.indv.length  short.indv.length | cut -f -12,14-16,18-20,22-24,26,28,30 > RSYW.breed.indv.ROH.all.and.3classes
 
-
-#I forgot to plot the linear regression against the length of corresponging group, rather than total ROH lengths
-
-##****remember!! to mannually add 0 for individuls with no mega lengths ROHS
-paste RSYW.delrhom_delhet_delnrhom_neurhom_neuhet_neunrhom_synrhom_synhet_synnrhom.result short_homalt.indv.del.syn.neu long_homalt.indv.del.syn.neu mega_homalt.indv.del.syn.neu short.indv.length long.indv.length mega.indv.length | cut -f 1-12,14-16,18-20,22-24,26,28,30 > RSYW_everything_withlengthsHomCount
 ```
