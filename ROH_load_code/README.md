@@ -41,11 +41,27 @@ example output: ```$CRNTDIR/RSYW_ROH/mega.ROHs/SK03_mega.ROH_homalt.bed```
 
 #### Extracting coordinates of different ROH classes
 ```
-parallel --colsep '\t' awk \'\(\$2==\"{2}\"\) \&\& \(\$5\-\$4\<300001\) {print\$3\"\\t\"\$4\"\\t\"\$5}\' $CRNTDIR/ROH_sheets/short.ROH_sheets/input.4.107.ROHs \> $CRNTDIR/ROH_sheets/short.ROH_sheets/{2}.short.ROHs :::: $TXTDIR/107.breed_indv_depth.DL.txt
+parallel --colsep '\t' awk \'\(\$2==\"{2}\"\) \&\& \(\$5\-\$4\<300001\) {print\$3\"\\t\"\$4\"\\t\"\$5}\' $CRNTDIR/ROH_sheets/input.4.107.ROHs.LH \> $CRNTDIR/ROH_sheets/short.ROH_sheets/{2}.short.ROHs.bed :::: $TXTDIR/107.breed_indv_depth.DL.txt
 
-parallel --colsep '\t' awk \'\(\$2==\"{2}\"\) \&\& \(\$5\-\$4\>300000\) \&\& \(\$5\-\$4\<1000001\) {print\$3\"\\t\"\$4\"\\t\"\$5}\' $CRNTDIR/ROH_sheets/long.ROH_sheets/input.4.107.ROHs \> $CRNTDIR/ROH_sheets/long.ROH_sheets/{2}.long.ROHs :::: $TXTDIR/107.breed_indv_depth.DL.txt
+parallel --colsep '\t' awk \'\(\$2==\"{2}\"\) \&\& \(\$5\-\$4\>300000\) \&\& \(\$5\-\$4\<1000001\) {print\$3\"\\t\"\$4\"\\t\"\$5}\' $CRNTDIR/ROH_sheets/input.4.107.ROHs.LH \> $CRNTDIR/ROH_sheets/long.ROH_sheets/{2}.long.ROHs.bed :::: $TXTDIR/107.breed_indv_depth.DL.txt
 
-parallel --colsep '\t' awk \'\(\$2==\"{2}\"\) \&\& \(\$5\-\$4\>1000000\) {print\$3\"\\t\"\$4\"\\t\"\$5}\' $CRNTDIR/ROH_sheets/mega.ROH_sheets/input.4.107.ROHs \> $CRNTDIR/ROH_sheets/mega.ROH_sheets/{2}.mega.ROHs :::: $TXTDIR/107.breed_indv_depth.DL.txt
+parallel --colsep '\t' awk \'\(\$2==\"{2}\"\) \&\& \(\$5\-\$4\>1000000\) {print\$3\"\\t\"\$4\"\\t\"\$5}\' $CRNTDIR/ROH_sheets/input.4.107.ROHs.LH \> $CRNTDIR/ROH_sheets/mega.ROH_sheets/{2}.mega.ROHs.bed :::: $TXTDIR/107.breed_indv_depth.DL.txt
+
+```
+double check if numbers of ROH match (mind the working directory)
+```
+wc -l *ROHs | grep -v total | grep  -v inpu | awk '{print$2"\t"$1-1}' | sort > ROH.numbers.107.noheaders
+parallel wc -l {2}.ROH_sheets/{1}.{2}.ROHs :::: $TXTDIR/107.indv.DL.txt ::: short long mega > 3classes_line_count.no_headers
+parallel grep {} 3classes_line_count.no_headers \| awk \'{sum+=\$1} END {print\"{}\\t\"sum}\' :::: ../../txt_might_be_useful/107.indv.DL.txt  | sort > ROH.sum.3calsses
+paste ROH.numbers.107.noheaders ROH.sum.3calsses 
+
+```
+
+20240115
+it seems that the total number of sites are different when adding vcfs of diff.lengths ROH and total ROHs, let's check if first line of bed file is omitted by vcf or bedtools. 
+```
+parallel sed -i \'1i\\chrm\\tstart\\tend\' $CRNTDIR/ROH_sheets/{2}.ROH_sheets/{1}.{2}.ROHs.bed :::: $TXTDIR/107.indv.DL.txt ::: short long mega
+
 ```
 
 #### Get lengths of different ROH classes
@@ -62,7 +78,7 @@ parallel sed -i \'1i\\indv\\t{}_length\' RSYW_ROH/{}.indv.length ::: short long 
 ```
 parallel bedtools intersect \
         -a vcfs/{1}.roh.homALT.recode.vcf \
-        -b ROH_sheets/{2}.ROH_sheets/{1}.{2}.ROHs \
+        -b ROH_sheets/{2}.ROH_sheets/{1}.{2}.ROHs.bed \
         \| awk \'{print\$1\"\\t\"\$2-1\"\\t\"\$2}\' \
         \> RSYW_ROH/{2}.ROHs/{1}_{2}.ROH_homalt.bed  \
         :::: $TXTDIR/RSYW.popline.txt ::: short long mega
