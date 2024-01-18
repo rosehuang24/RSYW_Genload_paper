@@ -23,16 +23,18 @@ vcftools --gzvcf $parentDIR/anc_inferrence/116combineVCFs/116.swapped.WG.vcf.gz 
         --out $parentDIR/anc_inferrence/indv_vcfs/$indv.swapped.WG
 
 # to extract selregion homozygous and heterozygous
+indv=`head -n ${SLURM_ARRAY_TASK_ID}  $TXTDIR/RSYW.popline.txt | tail -n1 | awk '{print $1}'`
+
 parallel vcftools --vcf $parentDIR/anc_inferrence/indv_vcfs/$indv.swapped.WG.recode.vcf \
             --bed $parentDIR/108/RSYW_selregion/rank_CMS/{1}_rankCMS.xrf_ave.selected_regions.merged.bed \
             --non-ref-ac 2 --recode \
-            --out RSYW_selregion/rank_CMS/vcfs/$indv_in_{1}.hom \
+            --out RSYW_selregion/rank_CMS/vcfs/${indv}_in_{1}.hom \
             ::: SK WLH YVC
 
 parallel vcftools --vcf $parentDIR/anc_inferrence/indv_vcfs/$indv.swapped.WG.recode.vcf \
             --bed $parentDIR/108/RSYW_selregion/rank_CMS/{1}_rankCMS.xrf_ave.selected_regions.merged.bed \
             --max-non-ref-ac 1 --recode \
-            --out RSYW_selregion/rank_CMS/vcfs/$indv_in_{1}.het \
+            --out RSYW_selregion/rank_CMS/vcfs/${indv}_in_{1}.het \
             ::: SK WLH YVC
 ```
 
@@ -41,10 +43,10 @@ parallel vcftools --vcf $parentDIR/anc_inferrence/indv_vcfs/$indv.swapped.WG.rec
 
 ```
 parallel bedtools intersect \
-        -a RSYW_selregion/rank_CMS/vcfs/$indv_in_{1}.{2}.recode.vcf \
+        -a RSYW_selregion/rank_CMS/vcfs/${indv}_in_{1}.{2}.recode.vcf \
         -b {3} \
         \| awk \'{print\$1\"\\t\"\$2-1\"\\t\"\$2}\' \
-        \> RSYW_selregion/rank_CMS/midfiles/$indv_in_{1}.{2}.{4}.pos.bed \
+        \> RSYW_selregion/rank_CMS/midfiles/${indv}_in_{1}.{2}.{4}.pos.bed \
         ::: SK WLH YVC ::: hom het \
         ::: 116.deleterious.pos.bed 116.synonymous.pos.bed 116.ucsc.cds.neutral.auto.pos.bed \
         :::+ deleterious synonymous neutral
