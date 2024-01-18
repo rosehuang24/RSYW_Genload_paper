@@ -16,7 +16,9 @@ Then we extracted variant information (VCF) for all individuals of RJF, YVC, SK 
 indv=`head -n ${SLURM_ARRAY_TASK_ID}  $TXTDIR/107.breed_indv_depth.DULO.txt | tail -n1 | awk '{print $2}'`
 
 #I keep this seperately from other steps is because these vcfs might become handy in future. 107 of them
+#SBTACH -a 1-107
 vcftools --gzvcf $parentDIR/anc_inferrence/116combineVCFs/116.swapped.WG.vcf.gz \
+        --keep $indv
         --non-ref-ac 1 --recode \
         --out $parentDIR/anc_inferrence/indv_vcfs/$indv.swapped.WG
 
@@ -35,9 +37,21 @@ parallel vcftools --vcf $parentDIR/anc_inferrence/indv_vcfs/$indv.swapped.WG.rec
 ```
 
 
+### Intersect with three categories
 
+```
+parallel bedtools intersect \
+        -a RSYW_selregion/rank_CMS/vcfs/$indv_in_{1}.{2}.recode.vcf \
+        -b {3} \
+        \| awk \'{print\$1\"\\t\"\$2-1\"\\t\"\$2}\' \
+        \> RSYW_selregion/rank_CMS/midfiles/$indv_in_{1}.{2}.{4}.pos.bed \
+        ::: SK WLH YVC ::: hom het \
+        ::: 116.deleterious.pos.bed 116.synonymous.pos.bed 116.ucsc.cds.neutral.auto.pos.bed \
+        :::+ deleterious synonymous neutral
 
+```
 
+Now you have each individual's polymophysms in selected regions with variant impact annotation
 
 
 
