@@ -7,13 +7,20 @@ Then we extracted variant information (VCF) for RJF, YVC, SK and WLH in the sele
 
 ```
 parallel bedtools intersect \
-    -a ../vcfs/{1}.{2}.non-ref-ac1.recode.vcf \
-    -b ../../108/RSYW_selregion/rank_CMS/{3}_rankCMS.xrf_ave.selected_regions.bed \
-    -wa -wb \> rank_CMS/midfiles/{1}_in_{3}.{2}.intersect \
+    -a {2} \
+    -b /storage/zhenyingLab/huangruoshi/108/RSYW_selregion/rank_CMS/{3}_rankCMS.xrf_ave.selected_regions.bed \
+    -wa -wb \| awk \'{print\$1\"\\t\"\$2-1\"\\t\"\$2}\' \
+    \> RSYW_selregion/rank_CMS/midfiles/{1}_in_{3}.{4}.pos.bed \
     ::: RJF SK YVC WLH \
-    ::: low_synonymous_only.noNH modifier.2643loci moderate.gerp1 \
+    ::: 116.deleterious.pos.bed 116.synonymous.pos.bed 116.ucsc.cds.neutral.auto.pos.bed \
+    :::+ deleterious synonymous neutral \
     :::  SK YVC WLH
 ```
+
+
+
+
+
 ```
 parallel  python3 summarize_3cate.py  \
       -I rank_CMS/midfiles/{1}_in_{3}.{2}.intersect \
