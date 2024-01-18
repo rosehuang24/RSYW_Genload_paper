@@ -1,7 +1,51 @@
 # Genetic load counting variants for selective region (RSYW)
 
+```
+parentDIR=/storage/zhenyingLab/huangruoshi
+TXTDIR=/storage/zhenyingLab/huangruoshi/txt_might_be_useful
+REFDIR=/storage/zhenyingLab/huangruoshi/chicken_ref
+```
+
 Selected region for SK, YVC and WLH were detected using rank based method -- simply by multiplying rank of xpehh, fst and pi-ratio for every window. and cut-off is top 1%, so the numbers of selected windows were the same for all three breeds.
 
+Then we extracted variant information (VCF) for all individuals of RJF, YVC, SK and WLH in the seleted regions of the three breeds. In total there are 53 X 3 = 159 ``` ${indv}_in_${selregion}.vcf```
+
+### Input preperation
+
+```
+indv=`head -n ${SLURM_ARRAY_TASK_ID}  $TXTDIR/107.breed_indv_depth.DULO.txt | tail -n1 | awk '{print $2}'`
+
+#I keep this seperately from other steps is because these vcfs might become handy in future. 107 of them
+vcftools --gzvcf $parentDIR/anc_inferrence/116combineVCFs/116.swapped.WG.vcf.gz \
+        --non-ref-ac 1 --recode \
+        --out $parentDIR/anc_inferrence/indv_vcfs/$indv.swapped.WG
+
+# to extract selregion homozygous and heterozygous
+parallel vcftools --vcf $parentDIR/anc_inferrence/indv_vcfs/$indv.swapped.WG.recode.vcf \
+            --bed $parentDIR/108/RSYW_selregion/rank_CMS/{1}_rankCMS.xrf_ave.selected_regions.merged.bed \
+            --non-ref-ac 2 --recode \
+            --out RSYW_selregion/rank_CMS/vcfs/$indv_in_{1}.hom \
+            ::: SK WLH YVC
+
+parallel vcftools --vcf $parentDIR/anc_inferrence/indv_vcfs/$indv.swapped.WG.recode.vcf \
+            --bed $parentDIR/108/RSYW_selregion/rank_CMS/{1}_rankCMS.xrf_ave.selected_regions.merged.bed \
+            --max-non-ref-ac 1 --recode \
+            --out RSYW_selregion/rank_CMS/vcfs/$indv_in_{1}.het \
+            ::: SK WLH YVC
+```
+
+
+
+
+
+
+
+
+
+
+
+
+#============================================================================================
 Then we extracted variant information (VCF) for RJF, YVC, SK and WLH in the seleted regions of the three breeds. In total there are twelve ```${pop}_in_${selregion}.vcf```
 
 
