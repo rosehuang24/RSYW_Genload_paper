@@ -72,4 +72,9 @@ cat snpeff_anno/*MODIFIER.NH.pos.bed | sort -k 1,1n -k 2,2n > 116.neutral.pos.be
 /storage/zhenyingLab/huangruoshi/genload/116.deleterious.pos.bed
 ```
 
-
+## Additional Note:
+20240123: We have tried different neutral regions conditions, such as ensembl.cds.fa and gff.cds and repetitive region (ucsc and ensembl hardmask files). See RH_20240116.pptx
+Up until this date we decided to use mRNA+ucsc, the neutral region chuck bed is in: 
+```
+/storage/zhenyingLab/huangruoshi/genload/116.ucsc.mRNA.neutral.auto.pos.bed
+```
