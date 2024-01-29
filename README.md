@@ -78,3 +78,9 @@ Up until this date we decided to use mRNA+ucsc, the neutral region chuck bed is 
 ```
 /storage/zhenyingLab/huangruoshi/genload/impact_polymophs/116.ucsc.mRNA.neutral.auto.pos.bed
 ```
+
+20240129: when use miyata score (1.85 as cutoff) to define deleteriousness:
+```
+parallel bedtools intersect -a 116.aO_MODERATE.pos.bed -b $REFDIR/GERP_score_bins/{}.bed -wa -wb \> GERP_dis/midfiles/116.aO.MODERATE.{} :::: GERP_1_FILES.list
+cat GERP_dis/midfiles/116.aO.MODERATE.gerp_scores* | cut -f 1-3 | sort -k 1,1n -k 2,2n > 116.aO_deleterious.pos.bed
+```
