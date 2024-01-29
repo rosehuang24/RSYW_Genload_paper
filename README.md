@@ -81,6 +81,6 @@ Up until this date we decided to use mRNA+ucsc, the neutral region chuck bed is 
 
 20240129: when use miyata score (1.85 as cutoff) to define deleteriousness:
 ```
-parallel bedtools intersect -a 116.aO_MODERATE.pos.bed -b $REFDIR/GERP_score_bins/{}.bed -wa -wb \> GERP_dis/midfiles/116.aO.MODERATE.{} :::: GERP_1_FILES.list
-cat GERP_dis/midfiles/116.aO.MODERATE.gerp_scores* | cut -f 1-3 | sort -k 1,1n -k 2,2n > 116.aO_deleterious.pos.bed
+#grep MODERATE snpeff_anno/116.aO.SnpEff_ann.out | grep -v HIGH | sort -k 1,1n -k 2,2n | uniq > midfiles.miyata.input
+#python3 $scriptDIR/miyata.del.cutoff.py -I midfiles.miyata.input -O 116.aO_miyata_deleterious.pos.bed -M $parentDIR/Miyata_score/miyata_score_tab.txt 
 ```
