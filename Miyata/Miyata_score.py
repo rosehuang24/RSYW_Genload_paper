@@ -43,3 +43,4 @@ with (gzip.open if args.input.endswith(".gz") else open)(args.input, "rt") as in
 
 inh.close()
 outh.close()
+mh.close()
