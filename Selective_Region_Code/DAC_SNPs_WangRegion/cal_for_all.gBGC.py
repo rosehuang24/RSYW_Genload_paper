@@ -47,7 +47,7 @@ with (gzip.open if args.input.endswith(".gz") else open)(args.input, "rt") as in
 
 outh.write(name+"\tWWSS\t"+str(unbiased_sites)+"\t"+str(unbiased_vars)+"\t"+str(unbiased_vars/unbiased_sites)+"\n")
 outh.write(name+"\tSW\t"+str(SW_sites)+"\t"+str(SW_vars)+"\t"+str(SW_vars/SW_sites)+"\n")
-outh.write(name+"\tWS\t"+str(WS_sites)+"\t"+str(WS_vars)+"\t"+str(WS_vars/WS_sites))
+outh.write(name+"\tWS\t"+str(WS_sites)+"\t"+str(WS_vars)+"\t"+str(WS_vars/WS_sites)+"\n")
 
 inh.close()
 outh.close()
