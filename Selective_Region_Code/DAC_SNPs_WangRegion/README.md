@@ -34,6 +34,9 @@ vcftools --gzvcf Wang2020_hglft_SYW/vcfs/$pop.NRA1.aO.recode.vcf.gz \
        --freq \
        --out Wang2020_hglft_SYW/$pop.aO
 ```
+
+
+
 #awk '{print$1"\t"$2-1"\t"$2"\t"$6}' WLH.aO.frq.count > WLH.aO.frq.count.bed
 #awk '{print$1"\t"$2-1"\t"$2"\t"$6}' SK.aO.frq.count >SK.aO.frq.count.bed
 #awk '{print$1"\t"$2-1"\t"$2"\t"$6}' YVC.aO.frq.count > YVC.aO.frq.count.bed
