@@ -31,10 +31,10 @@ with (gzip.open if args.input.endswith(".gz") else open)(args.input, "rt") as in
     for lines in inh:
         if not lines.startswith("CHROM"):
 #            pos=lines.strip().split()[0]+"\t"+str(int(lines.strip().split()[1])-1)+"\t"+lines.strip().split()[1]
-            ref=lines.strip().split()[4].split(":")[0]
-            alt=lines.strip().split()[5].split(":")[0]
+            ref=lines.strip().split()[3].split(":")[0]
+            alt=lines.strip().split()[4].split(":")[0]
             code=ref+alt
-            altfreq=float(lines.strip().split()[5].split(":")[1])
+            altfreq=float(lines.strip().split()[4].split(":")[1])
             if code in unbiased_ls:
                 unbiased_sites+=1
                 unbiased_vars+=args.alleles*altfreq
