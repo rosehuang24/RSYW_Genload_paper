@@ -1,9 +1,11 @@
+#input will be whatever is out from vcftools --freq
+
 import argparse
 import gzip
 parser = argparse.ArgumentParser()
 parser.add_argument("-I","--input", help="input file, zipped or unzipped vcf",required=True)
 parser.add_argument("-O","--output", help="output file name",required=True)
-parser.add_argument("-n","--alleles", help="number of alleles in the samping population.",type=int, required=True)
+parser.add_argument("-n","--samples", help="number of diploid individuals in the samping population.",type=int, required=True)
 parser.add_argument("-p","--population", help="name for population, if not provided, will use input name as default",required=False)
 
 args = parser.parse_args()
@@ -37,13 +39,13 @@ with (gzip.open if args.input.endswith(".gz") else open)(args.input, "rt") as in
             altfreq=float(lines.strip().split()[4].split(":")[1])
             if code in unbiased_ls:
                 unbiased_sites+=1
-                unbiased_vars+=args.alleles*altfreq
+                unbiased_vars+=args.samples*2*altfreq
             elif code in SW_ls:
                 SW_sites+=1
-                SW_vars+=args.alleles*altfreq
+                SW_vars+=args.samples*2*altfreq
             elif code in WS_ls:
                 WS_sites+=1
-                WS_vars+=args.alleles*altfreq
+                WS_vars+=args.samples*2*altfreq
 
 outh.write(name+"\tWWSS\t"+str(unbiased_sites)+"\t"+str(unbiased_vars)+"\t"+str(unbiased_vars/unbiased_sites)+"\n")
 outh.write(name+"\tSW\t"+str(SW_sites)+"\t"+str(SW_vars)+"\t"+str(SW_vars/SW_sites)+"\n")
