@@ -5,9 +5,9 @@ working dir: ```/storage/zhenyingLab/huangruoshi/genload/```
 
 ### 1. SNPeff annotation
 ```
-java -Xmx4g -jar $snpeff -c $soft/snpEff/snpEff.config -v GRCg6a.99 \
-        /storage/zhenyingLab/huangruoshi/anc_inferrence/116combineVCFs/swapped.${chrm}_${startpos}_${endpos}.vcf.gz \
-        > vcfs/116.swapped.${chrm}_${startpos}_${endpos}.SnpEff_ann.out
+java -Xmx4g -jar $snpeff -c $soft/snpEff/snpEff.config -v GRCg6a.110 \
+        /storage/zhenyingLab/huangruoshi/anc_inferrence/116combineVCFs/swapped_aO.${chrm}_${startpos}_${endpos}.vcf.gz \
+        > tmp_dir/116.swapped.${chrm}_${startpos}_${endpos}.SnpEff_ann.out
 ```
 ### 2. Extract modifier, synonymous (low) and modifier
 
