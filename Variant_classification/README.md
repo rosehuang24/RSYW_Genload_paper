@@ -81,4 +81,50 @@ bedtools complement -i dispose.rep_cds_50kbflanking.bed  -g /storage/zhenyingLab
 
 The non-coding region: ```non_CDS_flanking_no_rep.bed```
 
+Further split to chromosomes 
+```nonCDS=non_CDS_flanking.chr${SLURM_ARRAY_TASK_ID}.bed```
+
+
+### Non-coding deleterious
+1. download the scores
+2. get autosomal sites (can be skipped)
+
+```
+~/biosoft/ucsc_tools/bigWigToBedGraph  gerp_conservation_scores.gallus_gallus.GRCg6a.bw  gerp_conservation_scores.gallus_gallus.GRCg6a.relase104_27sauro.bedgraph
+awk '($1<29)'  gerp_conservation_scores.gallus_gallus.GRCg6a.relase104_27sauro.bedgraph > gerp.auto.release104_27sauro.score.bed
+```
+
+3. Split GERP score to chromosomal level because the file is too large
+```
+parallel awk \'\(\$1=={}\)\' ../gerp.auto.release104_27sauro.score.bed \> scores_chrms/chr{}.gerp.scores.bed ::: {1..28}
+
+# remove rep region
+# chrm array
+bedtools subtract -a scores_chrms/chr${SLURM_ARRAY_TASK_ID}.gerp.scores.bed -b $REFDIR/repetitive_auto.bed > scores_chrms/chr${SLURM_ARRAY_TASK_ID}.gerp.scores.rep_removed.bed
+
+```
+4. Find the 1% cutoff and get the positions
+
+```
+#Rscript scores_chrms/top1.GERP.R
+
+awk '($4>=2.26)' scores_chrms/chr${SLURM_ARRAY_TASK_ID}.gerp.scores.rep_removed.bed > scores_chrms/chr${SLURM_ARRAY_TASK_ID}.gerp226.rep_removed.bed
+
+bedtools intersect -a scores_chrms/chr${SLURM_ARRAY_TASK_ID}.gerp226.rep_removed.bed -b $nonCDS  > tmp_dir/RSYW.chr${SLURM_ARRAY_TASK_ID}.gerp226.nonCDS.pos.bed
+
+#cat tmp_dir/RSYW.chr*.gerp226.nonCDS.pos.bed| sort -k 1,1n -k 2,2n > ../gerp226.pos.bed
+```
+
+ well in reality I already had the gerp=2 file, so I just used ```awk``` on those.
+
+### Non-coding neutral
+
+```
+awk '($4<0)' scores_chrms/chr${SLURM_ARRAY_TASK_ID}.gerp.scores.rep_removed.bed > scores_chrms/chr${SLURM_ARRAY_TASK_ID}.gerp_negative.rep_removed.bed
+
+bedtools intersect -a scores_chrms/chr${SLURM_ARRAY_TASK_ID}.gerp_negative.rep_removed.bed -b $nonCDS  > tmp_dir/RSYW.chr${SLURM_ARRAY_TASK_ID}.neutral.pos.bed
+
+cat RSYW.chr*.neutral.pos.bed | sort -k 1,1n -k 2,2n  > ../neutral.pos.bed
+```
+
 
