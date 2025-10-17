@@ -76,7 +76,8 @@ parallel --colsep '\t' -q awk '($1=="{1}") { if($3 > {2}) print $1"\t"$2"\t{2}";
 
 cat $ref/repetitive_auto.bed gff3.release110.CDS.50kbflanking.inrange.bed | sort -k 1,1n -k 2,2n | bedtools merge -i - | awk '($1<29) {print$0}' >  dispose.rep_cds_50kbflanking.bed
 
-bedtools complement -i dispose.rep_cds_50kbflanking.bed  -g /storage/zhenyingLab/huangruoshi/20211122_nh/genome.from.dna_rm | awk '($1<29) {print$0}' > non_CDS_flanking_no_rep.bed
+bedtools complement -i dispose.rep_cds_50kbflanking.bed  -g /storage/zhenyingLab/huangruoshi/20211122_nh/genome.from.dna_rm \ #hard-masked fa
+          | awk '($1<29) {print$0}' > non_CDS_flanking_no_rep.bed
 ```
 
 The non-coding region: ```non_CDS_flanking_no_rep.bed```
