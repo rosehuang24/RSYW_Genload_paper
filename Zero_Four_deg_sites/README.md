@@ -27,3 +27,5 @@ python3 fold_categorizing.py output_ann.vcf four-fold.coords zero-fold.coords al
 sort four-fold.coords > 4-fold-sorted_202306.coords
 sort zero-fold.coords > 0-fold-sorted_202306.coords
 ```
+# 4. Downstream analysis
+Details in ```job.sh```. Work related with neutral sites can be found in ..
